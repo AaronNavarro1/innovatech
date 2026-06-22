@@ -86,18 +86,24 @@ jobs:
         run: |
           kubectl apply -f k8s/ -n $EKS_NAMESPACE
 
-      # ---------- Actualizar BACKEND en EKS ----------
+# ---------- Actualizar BACKEND en EKS ----------
       - name: Actualizar BACKEND en EKS
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           EKS_NAMESPACE: ${{ secrets.EKS_NAMESPACE }}
         run: |
-          kubectl apply -f k8s/backend-deployment.yaml -n $EKS_NAMESPACE
-          kubectl apply -f k8s/backend-service.yaml -n $EKS_NAMESPACE
+          kubectl apply -f k8s/ -n $EKS_NAMESPACE
+
           kubectl set image deployment/tienda-backend \
-            backend=$ECR_REGISTRY/${ECR_REPO_BACKEND}:${IMAGE_TAG} \
+            backend=$ECR_REGISTRY/tienda-backend:eks-v1 \
             -n $EKS_NAMESPACE
+          
+          kubectl set image deployment/despacho-backend \
+            despacho-backend=$ECR_REGISTRY/tienda-despacho:eks-v1 \
+            -n $EKS_NAMESPACE
+
           kubectl rollout status deployment/tienda-backend -n $EKS_NAMESPACE
+          kubectl rollout status deployment/despacho-backend -n $EKS_NAMESPACE
 
       # ---------- Actualizar FRONTEND en EKS ----------
       - name: Actualizar FRONTEND en EKS
