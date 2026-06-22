@@ -4,7 +4,7 @@ metadata:
   name: despacho-backend
   namespace: innovatech-despachos
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: despacho-backend
