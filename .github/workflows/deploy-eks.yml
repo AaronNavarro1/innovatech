@@ -99,7 +99,7 @@ jobs:
             -n $EKS_NAMESPACE
           
           kubectl set image deployment/despacho-backend \
-            despacho-backend=$ECR_REGISTRY/tienda-despacho:eks-v1 \
+            backend=$ECR_REGISTRY/tienda-despacho:eks-v1 \
             -n $EKS_NAMESPACE
 
           kubectl rollout status deployment/tienda-backend -n $EKS_NAMESPACE
