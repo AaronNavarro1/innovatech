@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tienda-backend
-  namespace: innovatechDespachos
+  namespace: innovatech-despachos
 spec:
   replicas: 2
   selector:
