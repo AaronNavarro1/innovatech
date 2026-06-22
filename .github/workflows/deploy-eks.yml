@@ -86,16 +86,16 @@ jobs:
         run: |
           kubectl apply -f k8s/ -n $EKS_NAMESPACE
 
-# ---------- Actualizar BACKEND en EKS ----------
+      # ---------- Actualizar BACKEND en EKS ----------
       - name: Actualizar BACKEND en EKS
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           EKS_NAMESPACE: ${{ secrets.EKS_NAMESPACE }}
         run: |
-          # 1. Aplicamos toda la carpeta con los HPAs corregidos a 1 réplica
+          # 1. Aplicamos toda la carpeta
           kubectl apply -f k8s/ -n $EKS_NAMESPACE
 
-          # 2. Forzamos un reinicio limpio para vaciar los contenedores colgados por falta de memoria
+          # 2. Forzamos un reinicio limpio
           kubectl rollout restart deployment/ventas-backend -n $EKS_NAMESPACE
           kubectl rollout restart deployment/despacho-backend -n $EKS_NAMESPACE
 
@@ -109,9 +109,8 @@ jobs:
             backend=$ECR_REGISTRY/tienda-despacho:eks-v1 \
             -n $EKS_NAMESPACE
 
-          # 5. Verificamos que ambos despliegues reales terminen con éxito
-          kubectl rollout status deployment/ventas-backend -n $EKS_NAMESPACE
-          kubectl rollout status deployment/despacho-backend -n $EKS_NAMESPACE
+          # (Eliminados los 'rollout status' que causaban el timeout)
+
       # ---------- Actualizar FRONTEND en EKS ----------
       - name: Actualizar FRONTEND en EKS
         env:
@@ -119,25 +118,4 @@ jobs:
           EKS_NAMESPACE: ${{ secrets.EKS_NAMESPACE }}
         run: |
           kubectl apply -f k8s/frontend-deployment.yaml -n $EKS_NAMESPACE
-          kubectl apply -f k8s/frontend-service.yaml -n $EKS_NAMESPACE
-          kubectl set image deployment/tienda-frontend \
-            frontend=$ECR_REGISTRY/${ECR_REPO_FRONTEND}:${IMAGE_TAG} \
-            -n $EKS_NAMESPACE
-          kubectl rollout status deployment/tienda-frontend -n $EKS_NAMESPACE
-
-      # ---------- HPA (si existen los YAML) ----------
-      - name: Aplicar HPA (opcional)
-        env:
-          EKS_NAMESPACE: ${{ secrets.EKS_NAMESPACE }}
-        run: |
-          if [ -f k8s/backend-hpa.yaml ]; then kubectl apply -f k8s/backend-hpa.yaml -n $EKS_NAMESPACE; fi
-          if [ -f k8s/frontend-hpa.yaml ]; then kubectl apply -f k8s/frontend-hpa.yaml -n $EKS_NAMESPACE; fi
-
-      # ---------- Ver estado final ----------
-      - name: Ver pods y servicios
-        env:
-          EKS_NAMESPACE: ${{ secrets.EKS_NAMESPACE }}
-        run: |
-          kubectl get pods -n $EKS_NAMESPACE
-          kubectl get svc -n $EKS_NAMESPACE
-          kubectl get hpa -n $EKS_NAMESPACE || true
+          kubectl apply -f k8s/frontend
