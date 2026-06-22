@@ -1,13 +1,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: tienda-backend-hpa
+  name: ventas-backend-hpa
   namespace: innovatech-despachos
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: tienda-backend
+    name: ventas-backend
   minReplicas: 2
   maxReplicas: 10
   metrics:

@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tienda-backend
+  name: despacho-backend
   namespace: innovatech-despachos
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: tienda-backend
+      app: despacho-backend
   template:
     metadata:
       labels:
-        app: tienda-backend
+        app: despacho-backend
     spec:
       containers:
         - name: backend
-          image: 307303830111.dkr.ecr.us-east-1.amazonaws.com/tienda-backend:eks-v1 # Colocar uri de tu imagen en ECR
+          image: 307303830111.dkr.ecr.us-east-1.amazonaws.com/tienda-despacho:eks-v1 # Colocar uri de tu imagen en ECR
           ports:
             - containerPort: 3001
           env:
