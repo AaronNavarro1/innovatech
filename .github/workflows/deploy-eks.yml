@@ -92,20 +92,24 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           EKS_NAMESPACE: ${{ secrets.EKS_NAMESPACE }}
         run: |
-          # 1. Aplicamos toda la carpeta
+          # 1. Aplicamos toda la carpeta con los HPAs corregidos a 1 réplica
           kubectl apply -f k8s/ -n $EKS_NAMESPACE
 
-          # 2. Forzamos la actualización de la imagen para el Backend de Ventas
+          # 2. Forzamos un reinicio limpio para vaciar los contenedores colgados por falta de memoria
+          kubectl rollout restart deployment/ventas-backend -n $EKS_NAMESPACE
+          kubectl rollout restart deployment/despacho-backend -n $EKS_NAMESPACE
+
+          # 3. Forzamos la actualización de la imagen para el Backend de Ventas
           kubectl set image deployment/ventas-backend \
             backend=$ECR_REGISTRY/tienda-backend:eks-v1 \
             -n $EKS_NAMESPACE
           
-          # 3. Forzamos la actualización de la imagen para el Backend de Despachos
+          # 4. Forzamos la actualización de la imagen para el Backend de Despachos
           kubectl set image deployment/despacho-backend \
             backend=$ECR_REGISTRY/tienda-despacho:eks-v1 \
             -n $EKS_NAMESPACE
 
-          # 4. Verificamos que ambos despliegues reales terminen con éxito
+          # 5. Verificamos que ambos despliegues reales terminen con éxito
           kubectl rollout status deployment/ventas-backend -n $EKS_NAMESPACE
           kubectl rollout status deployment/despacho-backend -n $EKS_NAMESPACE
       # ---------- Actualizar FRONTEND en EKS ----------
