@@ -92,23 +92,21 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           EKS_NAMESPACE: ${{ secrets.EKS_NAMESPACE }}
         run: |
-          # 1. Aplicamos toda la carpeta para actualizar los archivos de venta y despacho
+          # 1. Aplicamos toda la carpeta
           kubectl apply -f k8s/ -n $EKS_NAMESPACE
 
-          # ======= ¡AQUÍ ESTÁ EL PASO 2! =======
-          # Forzamos la actualización de la imagen para el Backend de Ventas
-          kubectl set image deployment/tienda-backend \
+          # 2. Forzamos la actualización de la imagen para el Backend de Ventas
+          kubectl set image deployment/ventas-backend \
             backend=$ECR_REGISTRY/tienda-backend:eks-v1 \
             -n $EKS_NAMESPACE
           
-          # ======= ¡Y AQUÍ ESTÁ EL PASO 3! =======
-          # Forzamos la actualización de la imagen para el Backend de Despachos
+          # 3. Forzamos la actualización de la imagen para el Backend de Despachos
           kubectl set image deployment/despacho-backend \
             backend=$ECR_REGISTRY/tienda-despacho:eks-v1 \
             -n $EKS_NAMESPACE
 
-          # 4. Verificamos que ambos despliegues terminen con éxito
-          kubectl rollout status deployment/tienda-backend -n $EKS_NAMESPACE
+          # 4. Verificamos que ambos despliegues reales terminen con éxito
+          kubectl rollout status deployment/ventas-backend -n $EKS_NAMESPACE
           kubectl rollout status deployment/despacho-backend -n $EKS_NAMESPACE
       # ---------- Actualizar FRONTEND en EKS ----------
       - name: Actualizar FRONTEND en EKS
