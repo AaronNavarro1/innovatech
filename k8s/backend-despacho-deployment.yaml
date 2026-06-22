@@ -33,7 +33,7 @@ spec:
             - name: DB_PORT
               value: "3306"
 
-          # ======= CORREGIDO: Espacios de resources alineados =======
+          # ======= RECURSOS SPREPARADOS PARA HPA =======
           resources:
             requests:
               cpu: "100m"
@@ -41,18 +41,3 @@ spec:
             limits:
               cpu: "500m"
               memory: "512Mi"
-
-          # ======= CORREGIDO: Espacios de Health Checks alineados =======
-          readinessProbe:
-            httpGet:
-              path: /api/health
-              port: 3001
-            initialDelaySeconds: 5
-            periodSeconds: 5
-
-          livenessProbe:
-            httpGet:
-              path: /api/health
-              port: 3001
-            initialDelaySeconds: 10
-            periodSeconds: 10
