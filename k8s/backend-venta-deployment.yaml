@@ -15,7 +15,8 @@ spec:
     spec:
       containers:
         - name: backend
-          image: 307303830111.dkr.ecr.us-east-1.amazonaws.com/tienda-backend:eks-v1
+          # ¡AQUÍ ESTÁ LA CORRECCIÓN! (Cambiado a :latest)
+          image: 307303830111.dkr.ecr.us-east-1.amazonaws.com/tienda-backend:latest
           ports:
             - containerPort: 3001
           env:
@@ -29,7 +30,7 @@ spec:
                   name: mysql-secret
                   key: MYSQL_ROOT_PASSWORD
             - name: DB_NAME
-              value: "tienda_perritos"
+              value: "tienda_perritos" # Se mantiene tu configuración correcta
             - name: DB_PORT
               value: "3306"
 
