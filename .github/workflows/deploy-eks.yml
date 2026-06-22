@@ -1,4 +1,4 @@
-name: CI/CD Tienda Perritos EKS
+name: innovatech
 
 on:
   push:
