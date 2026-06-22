@@ -10,8 +10,9 @@ env:
   ECR_REPO_FRONTEND: tienda-frontend
   ECR_REPO_BACKEND: tienda-backend
   ECR_REPO_DB: tienda-db
+  ECR_REPO_DESPACHO: tienda-despacho
 
-jobs:
+jobs: 
   build-and-deploy:
     runs-on: ubuntu-latest
 
@@ -83,10 +84,7 @@ jobs:
         env:
           EKS_NAMESPACE: ${{ secrets.EKS_NAMESPACE }}
         run: |
-          kubectl apply -f k8s/namespace.yaml
-          kubectl apply -f k8s/mysql-secret.yaml -n $EKS_NAMESPACE
-          kubectl apply -f k8s/mysql-deployment.yaml -n $EKS_NAMESPACE
-          kubectl apply -f k8s/mysql-service.yaml -n $EKS_NAMESPACE
+          kubectl apply -f k8s/ -n $EKS_NAMESPACE
 
       # ---------- Actualizar BACKEND en EKS ----------
       - name: Actualizar BACKEND en EKS
