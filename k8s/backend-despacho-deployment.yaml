@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: 307303830111.dkr.ecr.us-east-1.amazonaws.com/tienda-despacho:eks-v1 # Colocar uri de tu imagen en ECR
+          image: 307303830111.dkr.ecr.us-east-1.amazonaws.com/tienda-despacho:eks-v1
           ports:
             - containerPort: 3001
           env:
@@ -33,7 +33,7 @@ spec:
             - name: DB_PORT
               value: "3306"
 
-          # Se agrega Resource para que Metrics Server calcule el % de CPU y Memoria para escalar 
+          # ======= CORREGIDO: Espacios de resources alineados =======
           resources:
             requests:
               cpu: "100m"
@@ -42,7 +42,7 @@ spec:
               cpu: "500m"
               memory: "512Mi"
 
-          # HEALTH CHECKS (PROBES)
+          # ======= CORREGIDO: Espacios de Health Checks alineados =======
           readinessProbe:
             httpGet:
               path: /api/health
