@@ -92,10 +92,10 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           EKS_NAMESPACE: ${{ secrets.EKS_NAMESPACE }}
         run: |
-          # 1. Aplicamos toda la carpeta
+          # 1. Aplicamos toda la carpeta con los HPAs corregidos
           kubectl apply -f k8s/ -n $EKS_NAMESPACE
 
-          # 2. Forzamos un reinicio limpio
+          # 2. Forzamos un reinicio limpio para vaciar contenedores colgados
           kubectl rollout restart deployment/ventas-backend -n $EKS_NAMESPACE
           kubectl rollout restart deployment/despacho-backend -n $EKS_NAMESPACE
 
@@ -109,13 +109,33 @@ jobs:
             backend=$ECR_REGISTRY/tienda-despacho:eks-v1 \
             -n $EKS_NAMESPACE
 
-          # (Eliminados los 'rollout status' que causaban el timeout)
-
       # ---------- Actualizar FRONTEND en EKS ----------
       - name: Actualizar FRONTEND en EKS
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           EKS_NAMESPACE: ${{ secrets.EKS_NAMESPACE }}
         run: |
-          kubectl apply -f k8s/frontend-deployment.yaml -n $EKS_NAMESPACE
-          kubectl apply -f k8s/frontend
+          # Los archivos ya se aplicaron en bloque arriba. Solo actualizamos la imagen con su TAG dinámico:
+          kubectl set image deployment/tienda-frontend \
+            frontend=$ECR_REGISTRY/${ECR_REPO_FRONTEND}:${IMAGE_TAG} \
+            -n $EKS_NAMESPACE
+
+      # ---------- Ver estado final ----------
+      - name: Ver pods y servicios
+        env:
+          EKS_NAMESPACE: ${{ secrets.EKS_NAMESPACE }}
+        run: |
+          kubectl get pods -n $EKS_NAMESPACE
+          kubectl get svc -n $EKS_NAMESPACE
+          kubectl get hpa -n $EKS_NAMESPACE || true
+
+      # ---------- Extraer Evidencias para el Informe ----------
+      - name: Extraer Evidencias de Variables y Logs
+        env:
+          EKS_NAMESPACE: ${{ secrets.EKS_NAMESPACE }}
+        run: |
+          echo "=== 1. VARIABLES DE ENTORNO (IE4) ==="
+          kubectl describe deployment ventas-backend -n $EKS_NAMESPACE
+          
+          echo "=== 2. LOGS DE BACKEND (IE6 y IE7) ==="
+          kubectl logs deployment/ventas-backend -n $EKS_NAMESPACE --tail=30 || true
